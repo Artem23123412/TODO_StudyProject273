@@ -1,9 +1,7 @@
-from . import models
-from django.db.models import Q, Count
+from . import models, forms
+from django.db.models import Q, Count, QuerySet
 
-
-
-def filter_progress(progress = 0, tag = "my_tasks"):
+def filter_task(progress = 0, tag = "my_tasks"):
     list_task = models.Task.objects.filter(Q(progress=progress) & Q(tag=tag))
     return list_task
 
@@ -18,6 +16,38 @@ def get_statistical(user: models.User):
         count_4=Count("progress", filter=Q(progress=4)),
     )
     return counts
+
+def readTasks(progress = 0, tag = "my_tasks"):
+    tasks = filter_task()
+    return tasks
+
+def updateTask(request, id):
+    if request.method == "GET":
+        id = request.GET.get("id")
+        task = models.Task.objects.get(id = id)
+        form = forms.Task_form(data=task)
+        return form
+    elif request.metod == "POST":
+        form = forms.Task_form(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return True
+        return False
+    return None
+
+def createTask(request):
+    if request.method == "GET":
+        form = forms.Task_form()
+        return form
+    elif request.metod == "POST":
+        form = forms.Task_form(data=request.POST)
+        if form.is_valid():
+            form.save()
+            return True
+        return False
+    return None
+
+
 
 
 
