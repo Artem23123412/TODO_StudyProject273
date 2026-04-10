@@ -1,14 +1,13 @@
 from . import models, forms
 from django.db.models import Q, Count, QuerySet
 
-def filter_task(progress = 0, tag = "my_tasks"):
-    list_task = models.Task.objects.filter(Q(progress=progress) & Q(tag=tag))
+def get_filter_task(user: models.User, progress = 0, tag = "my_tasks"):
+    list_task = tasks.filter(Q(progress=progress) & Q(tag=tag))
     return list_task
 
-def get_statistical(user: models.User):
-    user.objects.get(id=2)
-    tasks = user.task.select_related("author").all()
-    counts = tasks.aggregate(
+def get_statistical(user: QuerySet):
+    tasks = user.prefetch_related("task").get(id=2)
+    counts = tasks.task.aggregate(
         count_0=Count("progress", filter=Q(progress=0)),
         count_1=Count("progress", filter=Q(progress=1)),
         count_2=Count("progress", filter=Q(progress=2)),
